@@ -12,5 +12,5 @@ mobile app can send JSON data to so that it can be stored on our end.
 - run composer.phar install to get the packages.
 - Edit configuration in Laravel
 	- Change the encryption key - 32 character string
-	- Local/Production Environment detection
+	- Local/Production Environment detection (http://laravel.com/docs/configuration), bootstrap/start.php
 
