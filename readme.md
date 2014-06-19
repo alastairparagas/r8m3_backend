@@ -11,6 +11,5 @@ mobile app can send JSON data to so that it can be stored on our end.
 (Laravel 4.2 only supports PHP 5.4 and above).
 - run composer.phar install to get the packages.
 - Edit configuration in Laravel
-	- Change the encryption key - 32 character string
+	- Change the encryption key - 32 character string (http://www.sethcardoza.com/tools/random-password-generator/)
 	- Local/Production Environment detection (http://laravel.com/docs/configuration), bootstrap/start.php
-
