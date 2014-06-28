@@ -1,11 +1,12 @@
 {
-	"name": "stela/r8m3",
+	"name": "Stela/R8M3",
 	"description": "R8M3 Web and Hybrid Mobile App",
-	"keywords": ["framework", "laravel"],
+	"keywords": ["api", "laravel"],
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.1.*",
-                "laravelbook/ardent": "dev-master"
+        "laravelbook/ardent": "dev-master",
+		"barryvdh/laravel-cors": "dev-master"
 	},
 	"autoload": {
 		"classmap": [
