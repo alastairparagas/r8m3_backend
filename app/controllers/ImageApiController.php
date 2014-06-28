@@ -36,7 +36,7 @@ class ImageApiController extends BaseController {
     public function addImage(){
         $image = new Image;
         $image->user_id = Auth::user()->id;
-        $image->id = str_random("15");
+        $image->id = time().str_random("5");
         $image->rating = 0;
         $image->raters_count = 0;
         
