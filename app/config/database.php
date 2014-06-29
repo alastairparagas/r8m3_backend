@@ -55,7 +55,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'R8M3',
+			'database'  => 'saterniv_R8M3',
 			'username'  => 'saterniv_tair',
 			'password'  => 'CocoLoco1234abcd',
 			'charset'   => 'utf8',
