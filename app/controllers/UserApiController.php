@@ -48,5 +48,17 @@ class UserApiController extends BaseController {
         
         return $this->jsonResponse("ok", "Succesfully saved profile edits", Input::get('callback'));
     }
+	
+	/**
+	* Logs the user in with our basic auth, returns whether it was successful or not.
+	* @return type JSON response of results
+	*/
+	public function loginUser(){
+		if(Auth::attempt(array('username' => Input::get('username'), 'password' => Input::get('password')), true)){
+			return $this->jsonResponse("ok", "Successfully logged in", Input::get('callback'));
+		}else{
+			return $this->jsonResponse("error", "Incorrect credentials/User does not exist", Input::get('callback'));
+		}
+	}
 
 }

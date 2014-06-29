@@ -32,6 +32,11 @@ Route::group(array('prefix' => 'api/v1'), function() {
         'as' => 'user-add-json',
         'uses' => 'UserApiController@addUser'
     ));
+	
+	Route::any('/user/login', array(
+		'as' => 'user-login-json',
+		'uses' => 'UserApiController@loginUser'
+	));
 
     Route::group(array('before' => 'auth.basicOnce'), function() {
 
