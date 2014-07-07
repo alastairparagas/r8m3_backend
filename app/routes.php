@@ -38,11 +38,10 @@ Route::group(array('prefix' => 'api/v1'), function() {
 		'uses' => 'UserApiController@loginUser'
 	));
 	
-	// Add POST-ed image to server with other information
-    Route::any('/image/add', array(
-        'as' => 'image-add-json',
-        'uses' => 'ImageApiController@addImage'
-    ));
+	Route::any('/image/add-guest', array(
+		'as' => 'image-guest-add-json',
+		'uses' => 'ImageApiController@addImage'
+	));
 
     Route::group(array('before' => 'auth.basicOnce'), function() {
 
@@ -57,6 +56,12 @@ Route::group(array('prefix' => 'api/v1'), function() {
             'as' => 'user-edit-json',
             'uses' => 'UserApiController@editUser'
         ));
+		
+		// Add POST-ed image to server with other information (Non-guest user)
+		Route::any('/image/add', array(
+			'as' => 'image-add-json',
+			'uses' => 'ImageApiController@addImage'
+		));
 
         // View images
         Route::any('/image/view', array(
