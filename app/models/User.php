@@ -59,6 +59,7 @@ class User extends Ardent implements UserInterface {
         $this->remember_token = $value;
     }
     
+	// Has many image children
     public function image(){
         $this->hasMany('Image');
     }
