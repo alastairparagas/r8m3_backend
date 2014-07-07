@@ -8,11 +8,17 @@ class ImageApiController extends BaseController {
      */
     public function viewImages(){
         // Default configuration
-        $orderBy = !empty(Input::get('orderBy')) ? Input::get('orderBy') : 'created_at';
-        $limit = !empty(Input::get('limit')) ? Input::get('limit') : '10';
+        $orderBy = Input::get('orderBy') ? Input::get('orderBy') : 'created_at';
+        $limit = Input::get('limit') > 0 ? Input::get('limit') : '30';
+		$startAt = Input::get('startAt') ? Input::get('startAt') : '1';
     
+        $images = Image::take($limit)->orderBy($orderBy);
         
-        
+		if($images->count() == 0){
+			return $this->jsonResponse("error", "No images retrieved with given parameters", Input::get('callback'));
+		}
+		
+		return $this->jsonResponse("ok", "Images found", Input::get('callback'), $images);
     }
     
     /**
@@ -35,8 +41,10 @@ class ImageApiController extends BaseController {
      */
     public function addImage(){
         $image = new Image;
-        $image->user_id = Auth::user()->id;
+        $image->user_id = Auth::user()->id ? Auth::user()->id || 0;
         $image->id = time().str_random("5");
+		Input::file('image_file_actual')->move(public_path('images'), $image->id.".png");
+		$image->file = public_path('images/'.$image->id.".png");
         $image->rating = 0;
         $image->raters_count = 0;
         
