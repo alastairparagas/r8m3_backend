@@ -41,7 +41,7 @@ class ImageApiController extends BaseController {
      */
     public function addImage(){
         $image = new Image;
-        $image->user_id = Auth::user()->id ? Auth::user()->id || 0;
+        $image->user_id = isset(Auth::user()) ? Auth::user()->id : 0;
         $image->id = time().str_random("5");
 		Input::file('image_file_actual')->move(public_path('images'), $image->id.".png");
 		$image->file = public_path('images/'.$image->id.".png");
