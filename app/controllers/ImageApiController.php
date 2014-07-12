@@ -48,7 +48,7 @@ class ImageApiController extends BaseController {
         $image->user_id = isset(Auth::user()->id) ? Auth::user()->id : "guest";
         $image->id = time().str_random("5");
         $imageName = $image->id . "." . Input::file('image_file_actual')->getClientOriginalExtension();	
-	$image->file = URL::asset('images/'.$imageName);
+		$image->file = URL::asset('images/'.$imageName);
         $image->rating = 0;
         $image->raters_count = 0;
         
