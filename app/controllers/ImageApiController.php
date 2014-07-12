@@ -40,19 +40,24 @@ class ImageApiController extends BaseController {
      * @return type JSON response of results
      */
     public function addImage(){
+    	if(!Input::hasFile('image_file_actual')){
+    		return $this->jsonResponse("error", "No image provided", Input::get('callback'));
+    	}
+    	
         $image = new Image;
-        $image->user_id = isset(Auth::user()) ? Auth::user()->id : 0;
+        $image->user_id = isset(Auth::user()->id) ? Auth::user()->id : "guest";
         $image->id = time().str_random("5");
-		Input::file('image_file_actual')->move(public_path('images'), $image->id.".png");
-		$image->file = public_path('images/'.$image->id.".png");
+        $imageName = $image->id . "." . Input::file('image_file_actual')->getClientOriginalExtension();	
+	$image->file = URL::asset('images/'.$imageName);
         $image->rating = 0;
         $image->raters_count = 0;
         
         if(!$image->save()){
             return $this->jsonResponse("error", "Cannot add image", Input::get('callback'), $image->errors());
         }
-        
-        return $this->jsonResponse("ok", "Succesfully registered", Input::get('callback'), $image);
+        	
+        Input::file('image_file_actual')->move(public_path('images'), $imageName);
+        return $this->jsonResponse("ok", "Succesfully added image", Input::get('callback'), $image);
     }
     
     /**
@@ -95,4 +100,3 @@ class ImageApiController extends BaseController {
     }
     
 }
-
