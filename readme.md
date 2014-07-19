@@ -1,6 +1,6 @@
 ## R8M3
 
-R8M3 is a web and hybrid mobile application (built using Phonegap-Cordova with the Camera plugin). 
+R8M3 is a web and hybrid mobile application (built using Phonegap-Cordova).
 This repository will hold the web application and the corresponding API interface that the hybrid 
 mobile app can send JSON data to so that it can be stored on our end.
 
