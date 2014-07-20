@@ -7,6 +7,9 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase {
 	 *
 	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
 	 */
+        
+         protected static $rootDomain = "http://localhost/R8M3/public/api/v1/";
+    
 	public function createApplication()
 	{
 		$unitTesting = true;
