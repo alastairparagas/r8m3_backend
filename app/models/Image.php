@@ -7,6 +7,7 @@ class Image extends Ardent{
     // Table in MySQL
     protected $table = 'images';
     protected $guarded = array('created_at', 'updated_at');
+    public $incrementing = false;
     
     // When saving or inserting rules, this must be followed
     public static $rules = array(
@@ -19,9 +20,17 @@ class Image extends Ardent{
     // Hydrates auto-magically whenever validation is called - for updating
     public $forceEntityHydrationFromInput = false;
     
-	// Belongs to User Model
+    // User Model has a bunch of personally uploaded images. First
+    // Parameter is this Model's parent, second parameter is the key that
+    // represents the first Model's identifier (defaults to mode_id so in this
+    // case, it would be user_id, and third is the name of the identifier in
+    // the parent table)
     public function user(){
-        $this->belongsTo('User');
+        return $this->belongsTo('User');
+    }
+    
+    public function rates(){
+        return $this->hasMany('Rate');
     }
     
 }
