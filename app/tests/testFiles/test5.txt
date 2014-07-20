@@ -1,0 +1,15 @@
+Dynamic American government system / Florida
+government
+	- Digital Government Plan
+		- "A 21st century platform to better serve the American people" Barack Obama
+	- Need for a responsive website 
+		- Laptop/Desktop and Smartphones
+		- HTML5 and CSS3 detection system
+		- Javascript detection system
+	- Apps in Mobile Markets
+		- Android, Apple
+		- Success by other Federal Agencies
+			- NASA
+			- ASK Karen (Department of Agriculture)
+			- USA Jobs (Office of Personnel Management)
+			- Veterans Affair Mobile (Department of Veterans Affairs)
