@@ -190,7 +190,7 @@ class ImageApiE2ETest extends TestCase {
         // Delete images that were added in this test
         foreach($this->addedImages as $addedImage){
             $image = Image::find($addedImage);
-            File::delete(public_path() . "images/" . basename($image->file));
+            File::delete(public_path() . "/images/" . basename($image->file));
             $image->delete();
         }
     }
