@@ -5,8 +5,10 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.1.*",
-        "laravelbook/ardent": "dev-master",
-		"barryvdh/laravel-cors": "dev-master"
+                "nategood/httpful": "*",
+                "laravelbook/ardent": "dev-master",
+		"barryvdh/laravel-cors": "dev-master",
+                "way/generators": "dev-master"
 	},
 	"autoload": {
 		"classmap": [
