@@ -40,13 +40,17 @@ class ImageApiE2ETest extends TestCase {
         // Images that will be added in the course of the test
         $this->addedImages = array();
         
-        // Images that already exist that we will be manipulating through the course of the test
-        $this->existingImages = array("RQVLC", "DF8QB", "DCDMZ");
+        // Images that already exist that we will be manipulating through the 
+        // course of the test. We will get them from the database randomly.
+        $this->existingImages = array();
         $this->existingImagesInfo = array();
+        // Go to the database and get 5 random images
         // Store current data for these images so after we test, we can
         // restore them back to their pre-testing state (practically unchanged values)
-        foreach($this->existingImages as $existingImage){
-            $this->existingImagesInfo[$existingImage] = Image::find($existingImage);
+        $existingImages = Image::orderBy(DB::raw('RAND()'))->take(5)->get();
+        foreach($existingImages as $existingImage){
+            $this->existingImages[] = $existingImage->id;
+            $this->existingImagesInfo[$existingImage->id] = $existingImage;
         }
         
         $this->nonexistingImages = array("JohnDoe", "ShortCircuit", "EmpireAttack");
