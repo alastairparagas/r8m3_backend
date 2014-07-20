@@ -23,7 +23,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'saterniv_r8m3',
+			'database'  => 'r8m3',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
