@@ -1,12 +1,23 @@
 <?php
 
+/**
+ * UserApiController handles all of our user data as well as user-centric methods. 
+ * API endpoints for this controller and their respective methods are:
+ *      user/view -> view()
+ *      user/add -> add()
+ *      user/edit -> edit()
+ *      user/login -> login()
+ *      user/images -> images()
+ * All the return types default to JSON, which are transmitted to our mobile
+ * and web applications.
+ */
+
 class UserApiController extends BaseController {
     
     /**
      * Returns information about current logged in User (HTTP Auth basic login)
-     * @return type JSON response of $results
      */
-    public function viewUser(){
+    public function view(){
         $user = User::where('username', '=', Auth::user()->username);
         if($user->count() != 1){
             return $this->jsonResponse("error", "User does not exist", Input::get('callback'));
@@ -16,9 +27,8 @@ class UserApiController extends BaseController {
     
     /**
      * Adds a User in our Database
-     * @return type JSON response of results
      */
-    public function addUser() {
+    public function add() {
         $user = new User;
         // Ardent Model automatically hydrates fields
         if (!$user->save()) {
@@ -30,9 +40,8 @@ class UserApiController extends BaseController {
 
     /**
      * Edits the current logged in User (HTTP Auth basic login)
-     * @return type JSON response of results
      */
-    public function editUser() {
+    public function edit() {
         $user = User::where('username', '=', Auth::user()->username);
 
         if($user->count() != 1){
@@ -49,16 +58,26 @@ class UserApiController extends BaseController {
         return $this->jsonResponse("ok", "Succesfully saved profile edits", Input::get('callback'));
     }
 	
-	/**
-	* Logs the user in with our basic auth, returns whether it was successful or not.
-	* @return type JSON response of results
-	*/
-	public function loginUser(){
-		if(Auth::attempt(array('username' => Input::get('username'), 'password' => Input::get('password')), true)){
-			return $this->jsonResponse("ok", "Successfully logged in", Input::get('callback'));
-		}else{
-			return $this->jsonResponse("error", "Incorrect credentials/User does not exist", Input::get('callback'));
-		}
+    /**
+    * Logs the user in with our basic auth, returns whether it was successful or not.
+    */
+    public function login(){
+	if(Auth::attempt(array('username' => Input::get('username'), 'password' => Input::get('password')), true)){
+            return $this->jsonResponse("ok", "Successfully logged in", Input::get('callback'));
+	}else{
+            return $this->jsonResponse("error", "Incorrect credentials/User does not exist", Input::get('callback'));
 	}
+    }
+    
+    public function images(){
+        if(empty(Auth::user()->username)){
+            return $this->jsonResponse("error", "You currently have no account.", Input::get('callback'));
+        }
+        
+        $images = User::where('username', '=', Auth::user()->username)->first()->images()->get();
+        if($images->count() > 0){
+            return $this->jsonResponse("ok", "User has images", Input::get('callback'), $images);
+        }
+    }
 
 }

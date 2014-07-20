@@ -1,34 +1,46 @@
 <?php
 
+/**
+ * ImageController handles all of our image manipulation. API endpoints for
+ * this controller and their respective methods are:
+ *      image/add -> add()
+ *      image/add-guest -> add()
+ *      image/view -> viewMultiple()
+ *      image/:id/rate -> rate($image_id)
+ *      image/:id/view -> viewOne($image_id)
+ *      image/:id/extend -> extendExpiration($image_id)
+ *      image/:id/delete -> delete($image_id)
+ */
+
 class ImageApiController extends BaseController {
     
     /**
      * Gives a list of images currently in the server, delimited by a limit and orderBy GET parameter
-     * @return type JSON response of results
      */
-    public function viewImages(){
+    public function viewMultiple(){
         // Default configuration
         $orderBy = Input::get('orderBy') ? Input::get('orderBy') : 'created_at';
-        $limit = Input::get('limit') > 0 ? Input::get('limit') : '30';
-		$startAt = Input::get('startAt') ? Input::get('startAt') : '1';
+        $limit = Input::get('limit') ? Input::get('limit') : 30;
+        Cache::add('startAt', DB::table('images')->count() - $limit, 10);
+	$startAt = Input::get('startAt') ? Input::get('startAt') : rand(1, Cache::get('startAt'));
     
-        $images = Image::take($limit)->orderBy($orderBy);
+        $images = Image::take($limit)->skip($startAt)->orderBy($orderBy)->get();
         
-		if($images->count() == 0){
-			return $this->jsonResponse("error", "No images retrieved with given parameters", Input::get('callback'));
-		}
+	if($images->count() == 0){
+		return $this->jsonResponse("error", "No images found with given parameters", Input::get('callback'));
+	}
 		
-		return $this->jsonResponse("ok", "Images found", Input::get('callback'), $images);
+	return $this->jsonResponse("ok", "Images found", Input::get('callback'), $images);
     }
     
     /**
      * Returns information about the image, include URL to image file
-     * @param type $image_id Identifier for image
-     * @return type JSON response of results
+     * @param type $image_id identifier of image being viewed
      */
-    public function viewImage($image_id){
+    public function viewOne($image_id){
         $image = Image::find($image_id);
-        if($image->count() != '1'){
+        
+        if(empty($image)){
             return $this->jsonResponse("error", "Cannot find image", Input::get('callback'));
         }
         
@@ -36,19 +48,29 @@ class ImageApiController extends BaseController {
     }
     
     /**
-     * Adds an image along with other passed information associated with the image
-     * @return type JSON response of results
+     * Adds an image along with other passed information associated 
+     * with the image to the database for it to be rated upon by other
+     * rateMe users.
      */
-    public function addImage(){
-    	if(!Input::hasFile('image_file_actual')){
-    		return $this->jsonResponse("error", "No image provided", Input::get('callback'));
+    public function add(){
+        $uploaded_image = Input::file('image_file_actual');
+        $allowedTypes = array("image/jpeg", "image/png", "image/jpg");
+        
+    	if( !Input::hasFile('image_file_actual') ){
+            return $this->jsonResponse("error", "No image provided", Input::get('callback'));
     	}
+        if( !in_array($uploaded_image->getMimeType(),$allowedTypes) ){
+            return $this->jsonResponse("error", "Uploaded invalided file type", Input::get('callback'));
+        }
     	
         $image = new Image;
         $image->user_id = isset(Auth::user()->id) ? Auth::user()->id : "guest";
-        $image->id = time().str_random("5");
-        $imageName = $image->id . "." . Input::file('image_file_actual')->getClientOriginalExtension();	
-		$image->file = URL::asset('images/'.$imageName);
+        $image->id = strtoupper(str_random("5"));
+	while( isset(Image::find($image->id)->file) ){
+		$image->id = strtoupper(str_random("5"));
+	}
+        $imageName = $image->id . "." . $uploaded_image->getClientOriginalExtension();	
+	$image->file = URL::asset('images/'.$imageName);
         $image->rating = 0;
         $image->raters_count = 0;
         
@@ -56,47 +78,94 @@ class ImageApiController extends BaseController {
             return $this->jsonResponse("error", "Cannot add image", Input::get('callback'), $image->errors());
         }
         	
-        Input::file('image_file_actual')->move(public_path('images'), $imageName);
+        $uploaded_image->move(public_path('images'), $imageName);
         return $this->jsonResponse("ok", "Succesfully added image", Input::get('callback'), $image);
     }
     
     /**
-     * Edits the image's associated information given the identifier of image
-     * @param type $image_id ID of image
-     * @return type JSON response of results
+     * Prolongs the image's survival date given the identifier of image
+     * simply by updating their updated_at date. A background cron will run every
+     * day to eliminate pictures that have been up for 7 days.
+     * @param type $image_id identifier of image whose expiration is being extended
      */
-    public function editImage($image_id){
+    public function extendExpiration($image_id){
         $image = Image::find($image_id);
         
-        if($image->count() != 1){
+        if(empty($image)){
             return $this->jsonResponse("error", "Image does not exist", Input::get('callback'));
         }
-        
-        $image = $image->first();
-        
+        $image->updated_at = date('Y-m-d G:i:s');
+        // Update timestamp
         if(!$image->updateUniques()){
             return $this->jsonResponse("error", "Unable to save image edits", Input::get('callback'), $image->errors());
         }
         
-        return $this->jsonResponse("ok", "Succesfully saved image edits", Input::get('callback'));
+        return $this->jsonResponse("ok", "Successfully extended expiration", Input::get('callback'));
     }
     
     /**
      * Deletes an image given an identifier for that image.
-     * @param type $image_id ID of image
-     * @return type JSON response of results
+     * @param type $image_id identifier of image being deleted
      */
-    public function deleteImage($image_id){
+    public function delete($image_id){
         $image = Image::find($image_id);
-        if($image->count() != '1'){
+        if(empty($image)){
             return $this->jsonResponse("error", "Cannot find image", Input::get('callback'));
         }
         
+        // Delete Image File
+        File::delete(URL::asset('images/'.basename($image->file)));
+        
+        // Delete SQL record
         if(!$image->delete()){
-            return $this->jsonResponse("error", "Cannot delete image", Input::get('callback'));
+            return $this->jsonResponse("error", "Cannot delete image", Input::get('callback'), $image->errors());
         }
         
         return $this->jsonResponse("ok", "Image deleted", Input::get('callback'));
     }
+    
+    /**
+     * Rates the image given an identifier for that image
+     * @param type $image_id identifier of image being rated
+     */
+    public function rate($image_id){
+        $image = Image::find($image_id);
+        $score = Input::get('score');
+        
+        if(empty($image)){
+            return $this->jsonResponse("error", "Cannot find image", Input::get('callback'));
+        }
+        
+        if(empty($score)){
+            return $this->jsonResponse("error", "No score provided", Input::get('callback'));
+        }
+        
+        if($score < 1 || $score > 10){
+            return $this->jsonResponse("error", "Not a valid score", Input::get('callback'));
+        }
+        
+        // Calculate the new score of the image.
+        // Image Rating = all score points / amount of people who scored images
+        // Multipling raters_count returns only all score points, to which
+        // we can add the given score and divide the new compounded points with
+        // the new count of population (old population + 1)
+        $image->rating = $image->rating > 0 ? (($image->rating * $image->raters_count) + $score) / ($image->raters_count + 1) : $score;
+        $image->raters_count = $image->raters_count + 1;
+        if(!$image->updateUniques()){
+            return $this->jsonResponse("error", "Cannot save score to image", Input::get('callback'), $image->errors());
+        }
+        
+        $rate = new Rate;
+        $rate->user_id = isset(Auth::user()->id) ? Auth::user()->id : "guest";
+        $rate->image_id = $image_id;
+        $rate->score = $score;
+        if(!$rate->save()){
+            return $this->jsonResponse("error", "Cannot save lone score", Input::get('callback'), $rate->errors());
+        }
+        
+        return $this->jsonResponse("ok", "Image successfully scored.", Input::get('callback'), $image);
+        
+    }
+    
     
 }
