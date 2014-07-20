@@ -69,6 +69,9 @@ class UserApiController extends BaseController {
 	}
     }
     
+    /**
+     * Returns the images made by the user.
+     */
     public function images(){
         if(empty(Auth::user()->username)){
             return $this->jsonResponse("error", "You currently have no account.", Input::get('callback'));
