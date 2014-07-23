@@ -52,6 +52,12 @@ Route::group(array('prefix' => 'api/v1'), function() {
             'as' => 'user-edit-json',
             'uses' => 'UserApiController@edit'
         ));
+        
+        // User's bunch of images
+        Route::any('/user/images', array(
+           'as' => 'users-images-json',
+           'uses' => 'UserApiController@images'
+        ));
 		
 	// Add POST-ed image to server with other information (Non-guest user)
 	Route::any('/image/add', array(
