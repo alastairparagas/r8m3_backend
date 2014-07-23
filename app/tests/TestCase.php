@@ -7,16 +7,14 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase {
 	 *
 	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
 	 */
-        
-         protected static $rootDomain = "http://localhost/R8M3/public/api/v1/";
+        protected $domain;
     
 	public function createApplication()
 	{
-		$unitTesting = true;
-
-		$testEnvironment = 'testing';
-
-		return require __DIR__.'/../../bootstrap/start.php';
+            $this->domain = "http://localhost/R8M3/public/api/v1/";
+            $unitTesting = true;
+            $testEnvironment = 'testing';
+            return require __DIR__.'/../../bootstrap/start.php';
 	}
 
 }
