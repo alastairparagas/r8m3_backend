@@ -12,6 +12,7 @@ mobile app can send JSON data to so that it can be stored on our end.
 	- Local/Production Environment detection (http://laravel.com/docs/configuration): Edit bootstrap/start.php to have your computer's hostname if not already there so it can be pre-detected for local environment detection.
 - Install XAMPP or any choice of LAMP-like PHP stack that works on your OS. Make sure to check your PHP.ini file to have upload_max_filesize set to more than 10mb and have fileinfo.dll extension be enabled (not commented out). If those things are not set, images over 2MB and failure to detect file types will be some errors that you may likely encounter.
 - Make sure to have PHP compiler/interpreter as an environment path on your local environment. This allows us to run stuff like phpunit and helpful Laravel stuff in the future right in the command line.
+- To get the correct database structure and seed your database with some test data, just follow the Laravel tutorials on seeding and schema. I've already developed the Schema structure and seed files for the database, all you have to do is command-line them.
 
 ### Before pushing a commit
 - This repository comes with Test Files to make sure our code is bug free before committing to this repository. As such, it is tantamount that you 1.) make sure that localhost is on before committing, and 2.) run the tests with `phpunit`.
