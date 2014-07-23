@@ -17,7 +17,8 @@
 
 class ImageApiE2ETest extends TestCase {
     
-    private $domain;
+    private $user;
+    private $userid;
     private $username;
     private $password;
     private $addedImages;
@@ -27,12 +28,13 @@ class ImageApiE2ETest extends TestCase {
     
     public function setUp() {
         parent::setUp();
-        // Root domain to use for testing API endpoints
-        $this->domain = TestCase::$rootDomain;
         
         // Credentials used to authenticate in HTTP BASIC guarded areas
         $this->username = "apara1234";
         $this->password = "apara1234";
+        $user = User::where('username', '=', $this->username)->get();
+        $this->userid = $user[0]->id;
+        $this->user = $user[0];
         
         // Location of test folder relative to root of this project
         $this->testLocation = "\\app\\tests\\";
@@ -135,6 +137,8 @@ class ImageApiE2ETest extends TestCase {
                 $actualFile = getcwd() . $this->testLocation . "testFiles\\" . $file;
                 $actualFileInfo = pathinfo($actualFile);
                 
+                $oldUserInformation = User::find($this->userid);
+                
                 $fileArray = array('image_file_actual' => '@'.realpath($actualFile));
                 $response = Httpful::post($this->domain . 'image/add', $fileArray, "multipart/form-data")->authenticateWith($this->username, $this->password)->expectsType("application/json")->send();
                 
@@ -144,6 +148,9 @@ class ImageApiE2ETest extends TestCase {
                     $image = Image::find($response->body->info->id);
                     $this->assertNotNull($image);
                     $this->addedImages[] = $response->body->info->id;
+                    
+                    $newUserInformation = User::find($this->userid);
+                    $this->assertEquals($oldUserInformation->uploaded_count + 1, $newUserInformation->uploaded_count);
                 }else{
                     $this->assertEquals("application/json", $response->content_type);
                     $this->assertTrue($response->hasErrors());
@@ -176,6 +183,59 @@ class ImageApiE2ETest extends TestCase {
     }
     
     
+    /**
+     * Tests if rating works and does modify the score of the image
+     */
+    public function testRate(){
+        foreach($this->existingImages as $existingImage){
+            $originalRecord = $this->existingImagesInfo[$existingImage];
+            
+            // Test route is guarded
+            $response = Httpful::get($this->domain . 'image/' . $existingImage. '/rate')->send();
+            $this->assertEquals("text/html", $response->content_type);
+            $this->assertEquals("Invalid credentials.", $response->body);
+            
+            // Test not sending a score fails as expected
+            $response = Httpful::get($this->domain . 'image/' . $existingImage . '/rate')->authenticateWith($this->username, $this->password)->send();
+            $this->assertEquals("application/json", $response->content_type);
+            $this->assertTrue($response->hasErrors());
+            
+            // Test sending a score works and is modifying the database
+            $score = rand(1,10);
+            $response = Httpful::post($this->domain . 'image/' . $existingImage . '/rate', array('score' => $score), "multipart/form-data")->authenticateWith($this->username, $this->password)->send();
+            $this->assertEquals("application/json", $response->content_type);
+            $this->assertFalse($response->hasErrors());
+            $modifiedRecord = Image::find($existingImage);
+            $this->assertEquals($originalRecord->raters_count + 1, $modifiedRecord->raters_count); // Check raters count is appended
+            $this->assertTrue($modifiedRecord->rating > 0); // Score is not 0 because minimum is 1
+            
+            // Test sending another score to same image by same user is prohibited
+            $response = Httpful::post($this->domain . 'image/' . $existingImage . '/rate', array('score' => $score), "multipart/form-data")->authenticateWith($this->username, $this->password)->send();
+            $this->assertEquals("application/json", $response->content_type);
+            $this->assertTrue($response->hasErrors());
+        }
+    }
+    
+    
+    /**
+     * Tests if deleting an image through API endpoint works
+     */
+    public function testDelete(){
+        foreach($this->addedImages as $addedImage){
+            $image = Image::find($addedImage);
+            
+            $response = Httpful::get($this->domain . 'image/' . $addedImage . '/delete')->authenticateWith($this->username, $this->password)->send();
+            $this->assertEquals("application/json", $response->content_type);
+            $this->assertFalse($response->hasErrors());
+            
+            // File and DB record of Image does not exist anymore
+            $imageChanges = Image::find($addedImage);
+            $this->assertTrue(empty($imageChanges));
+            $this->assertFalse(File::exists(public_path() . "/images/" . basename($image->file)));
+        }
+    }
+    
+    
     // Restore back changes made to the database
     public function tearDown(){
         parent::tearDown();
@@ -190,13 +250,21 @@ class ImageApiE2ETest extends TestCase {
             $restoredImage->updated_at = $oldImage->updated_at;
             $restoredImage->created_at = $oldImage->created_at;
             $restoredImage->updateUniques();
+            
+            $ratesOfImage = Rate::where('image_id', '=', $existingImage);
+            $ratesOfImage->delete();
         }
         // Delete images that were added in this test
         foreach($this->addedImages as $addedImage){
             $image = Image::find($addedImage);
-            File::delete(public_path() . "/images/" . basename($image->file));
-            $image->delete();
+            if(!empty($image)){
+                File::delete(public_path() . "/images/" . basename($image->file));
+                $image->delete();
+            }
         }
+        // Restore back User model to previous state
     }
     
 }
+
+?>
