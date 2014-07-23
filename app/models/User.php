@@ -29,7 +29,7 @@ class User extends Ardent implements UserInterface {
     // Match input name when validating data to Model's columns
     public $autoHydrateEntityFromInput = true;
     // Hydrates auto-magically whenever validation is called - for updating
-    public $forceEntityHydrationFromInput = true;
+    public $forceEntityHydrationFromInput = false;
     
     // Hash this input name automatically
     public static $passwordAttributes = array('password');

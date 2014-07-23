@@ -18,11 +18,11 @@ class UserApiController extends BaseController {
      * Returns information about current logged in User (HTTP Auth basic login)
      */
     public function view(){
-        $user = User::where('username', '=', Auth::user()->username);
-        if($user->count() != 1){
+        $user = User::where('username', '=', Auth::user()->username)->get();
+        if(count($user) != 1){
             return $this->jsonResponse("error", "User does not exist", Input::get('callback'));
         }
-        return $this->jsonResponse("ok", "User Details", Input::get('callback'), $user->first());
+        return $this->jsonResponse("ok", "User Details", Input::get('callback'), $user);
     }
     
     /**
@@ -30,6 +30,7 @@ class UserApiController extends BaseController {
      */
     public function add() {
         $user = new User;
+        $user->forceEntityHydrationFromInput = true;
         // Ardent Model automatically hydrates fields
         if (!$user->save()) {
             return $this->jsonResponse("error", "Cannot add user", Input::get('callback'), $user->errors());
@@ -42,14 +43,14 @@ class UserApiController extends BaseController {
      * Edits the current logged in User (HTTP Auth basic login)
      */
     public function edit() {
-        $user = User::where('username', '=', Auth::user()->username);
-
-        if($user->count() != 1){
+        $user = User::find(Auth::user()->id);
+        
+        if(empty($user)){
             return $this->jsonResponse("error", "User does not exist", Input::get('callback'));
         }
         
-        $user = $user->first();
-        $user::$rules['password'] = (Input::get('password')) ? 'required' : '' ;
+        $user->forceEntityHydrationFromInput = true;
+        $user::$rules['password'] = '' ;
         
         if(!$user->updateUniques()){
             return $this->jsonResponse("error", "Unable to save profile edits", Input::get('callback'), $user->errors());
@@ -78,9 +79,12 @@ class UserApiController extends BaseController {
         }
         
         $images = User::where('username', '=', Auth::user()->username)->first()->images()->get();
-        if($images->count() > 0){
-            return $this->jsonResponse("ok", "User has images", Input::get('callback'), $images);
+        
+        if($images->count() == 0){
+            return $this->jsonResponse("error", "User has no images", Input::get('callback'));
         }
+        
+        return $this->jsonResponse("ok", "User has images", Input::get('callback'), $images);
     }
 
 }
