@@ -14,7 +14,7 @@ class CreateRatesTable extends Migration {
 	{
             Schema::dropIfExists('rates');
             Schema::create('rates', function(Blueprint $table){
-		$table->increments('id')->unique();
+		$table->increments('id');
                 $table->integer('user_id', 10)->references('id')->on('users');
                 $table->string('image_id', 10)->references('id')->on('images');
                 $table->integer('score', 2);

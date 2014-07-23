@@ -14,7 +14,7 @@ class CreateImagesTable extends Migration {
 	{
             Schema::dropIfExists('images');
             Schema::create('images', function(Blueprint $table){
-		$table->string('id', 10)->unique();
+		$table->string('id', 10);
                 $table->primary('id');
                 $table->integer('user_id', 10)->references('id')->on('users');
                 $table->string('file', 200);
