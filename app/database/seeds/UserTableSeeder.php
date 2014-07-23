@@ -6,13 +6,13 @@ class UserTableSeeder extends Seeder{
         // Test Accounts we need to have constant access
         $user = new User;
         $user->username = "apara1234";
-        $user->password = "apara1234";
+        $user->password = Hash::make("apara1234");
         $user->email = "alastairparagas@gmail.com";
         $user->save();
         
         $user = new User;
         $user->username = "test";
-        $user->password = "test";
+        $user->password = Hash::make("test");
         $user->email = "test@gmail.com";
         $user->save();
         
