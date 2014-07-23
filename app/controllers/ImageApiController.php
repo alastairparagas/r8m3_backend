@@ -79,6 +79,16 @@ class ImageApiController extends BaseController {
         }
         	
         $uploaded_image->move(public_path('images'), $imageName);
+        
+        if(!empty(Auth::user()->id)){
+            $user = User::find(Auth::user()->id);
+            $user->uploaded_count = $user->uploaded_count + 1;
+            $user::$rules['password'] = '';
+            if(!$user->updateUniques()){
+                return $this->jsonResponse("error", "Unable to increase upload_count of user", Input::get('callback'), $user->errors());
+            }
+        }
+        
         return $this->jsonResponse("ok", "Succesfully added image", Input::get('callback'), $image);
     }
     
@@ -112,9 +122,12 @@ class ImageApiController extends BaseController {
         if(empty($image)){
             return $this->jsonResponse("error", "Cannot find image", Input::get('callback'));
         }
+        if($image->user_id != Auth::user()->id){
+            return $this->jsonResponse("error", "Image owned by another user. Cannot delete image.", Input::get('callback'));
+        }
         
         // Delete Image File
-        File::delete(URL::asset('images/'.basename($image->file)));
+        File::delete(public_path() . "/images/" . basename($image->file));
         
         // Delete SQL record
         if(!$image->delete()){
@@ -130,6 +143,7 @@ class ImageApiController extends BaseController {
      */
     public function rate($image_id){
         $image = Image::find($image_id);
+        $existingRate = Rate::where('user_id', '=', Auth::user()->id)->where('image_id', '=', $image_id)->get();
         $score = Input::get('score');
         
         if(empty($image)){
@@ -142,6 +156,10 @@ class ImageApiController extends BaseController {
         
         if($score < 1 || $score > 10){
             return $this->jsonResponse("error", "Not a valid score", Input::get('callback'));
+        }
+        
+        if(count($existingRate) > 0){
+            return $this->jsonResponse("error", "You already rated the image", Input::get('callback'));
         }
         
         // Calculate the new score of the image.
