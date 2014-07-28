@@ -64,7 +64,7 @@ class UserApiController extends BaseController {
     */
     public function login(){
 	if(Auth::attempt(array('username' => Input::get('username'), 'password' => Input::get('password')), true)){
-            return $this->jsonResponse("ok", "Successfully logged in", Input::get('callback'));
+            return $this->jsonResponse("ok", "Successfully logged in", Input::get('callback'), Auth::user()->id);
 	}else{
             return $this->jsonResponse("error", "Incorrect credentials/User does not exist", Input::get('callback'));
 	}
