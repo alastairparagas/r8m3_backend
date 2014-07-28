@@ -21,10 +21,19 @@ class ImageApiController extends BaseController {
         // Default configuration
         $orderBy = Input::get('orderBy') ? Input::get('orderBy') : 'created_at';
         $limit = Input::get('limit') ? Input::get('limit') : 30;
-        Cache::add('startAt', DB::table('images')->count() - $limit, 10);
-	$startAt = Input::get('startAt') ? Input::get('startAt') : rand(1, Cache::get('startAt'));
+        Cache::add('maxStartAt', DB::table('images')->count() - $limit, 10);
+        
+        if(Input::has('startAt')){
+             $startAt = Input::get('startAt');
+        }else{
+            if(Cache::get('maxStartAt') > 0){
+               $startAt = rand(1, Cache::get('maxStartAt'));
+            }else{
+                $startAt = 0;
+            }
+        }
     
-        $images = Image::take($limit)->skip($startAt)->orderBy($orderBy)->get();
+        $images = Image::with('rates')->take($limit)->skip($startAt)->orderBy($orderBy)->get();
         
 	if($images->count() == 0){
 		return $this->jsonResponse("error", "No images found with given parameters", Input::get('callback'));
