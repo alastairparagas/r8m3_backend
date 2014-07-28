@@ -21,7 +21,10 @@ class ImageApiController extends BaseController {
         // Default configuration
         $orderBy = Input::get('orderBy') ? Input::get('orderBy') : 'created_at';
         $limit = Input::get('limit') ? Input::get('limit') : 30;
-        Cache::add('maxStartAt', DB::table('images')->count() - $limit, 10);
+        
+        if(!Cache::has('maxStartAt')){
+            Cache::add('maxStartAt', DB::table('images')->count() - $limit, 10);
+        }
         
         if(Input::has('startAt')){
              $startAt = Input::get('startAt');
