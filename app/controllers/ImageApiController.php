@@ -35,7 +35,8 @@ class ImageApiController extends BaseController {
                 $startAt = 0;
             }
         }
-    
+        
+        // Take rates relation
         $images = Image::with('rates')->take($limit)->skip($startAt)->orderBy($orderBy)->get();
         
 	if($images->count() == 0){
