@@ -19,4 +19,5 @@ mobile app can send JSON data to so that it can be stored on our end.
 - Before running PHPUnit, make sure to import database migrations (http://culttt.com/2013/05/06/laravel-4-migrations/), which automatically creates our database tables and columns for us, and seed that database (http://culttt.com/2013/12/16/seeding-laravel-4-database/) with test data for testability purposes.
 
 ### Further documentation
-You can see further documentation for certain steps and quirks on developing R8M3 to our repository's Wiki page, which contains more specific information on certain tools used and suggested workflow. Also, if you need help, do not hesitate posting it on the Wiki!
+You can see further documentation for certain steps and quirks on developing R8M3 to our repository's Wiki page, which contains more specific information on certain tools used and suggested workflow. Also, if you need help, do not hesitate posting it on the Wiki
+You can access the Wiki on the side menu (same menu bar to view commits and source) of BitBucket.
