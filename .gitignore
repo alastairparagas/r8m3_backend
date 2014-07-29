@@ -2,6 +2,7 @@
 /vendor
 /nbproject
 /sass
+/public/error_log
 composer.phar
 composer.lock
 .env.*.php
