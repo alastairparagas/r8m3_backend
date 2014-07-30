@@ -37,7 +37,7 @@ class ImageApiController extends BaseController {
         }
         
         // Take rates relation
-        $images = Image::with('ratees')->take($limit)->skip($startAt)->orderBy($orderBy)->get();
+        $images = Image::with('rates')->take($limit)->skip($startAt)->orderBy($orderBy)->get();
         
 	if($images->count() == 0){
 		return $this->jsonResponse("error", "No images found with given parameters", Input::get('callback'));
