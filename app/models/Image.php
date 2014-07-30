@@ -34,7 +34,7 @@ class Image extends Ardent{
     }
     
     public function ratees(){
-        return $this->hasMany('Rate')->select('id', 'user_id');
+        return $this->hasMany('Rate')->select(array('image_id', 'user_id'));
     }
     
 }
