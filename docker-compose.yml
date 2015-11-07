@@ -1,0 +1,14 @@
+web:
+  build: .
+  links:
+    - db
+  volumes:
+    - /var/www/app/public/images
+    - ./vendor:/var/www/vendor
+  ports:
+    - "8080:80"
+
+db:
+  build: ./docker-db
+  env_file:
+    - .env.db
