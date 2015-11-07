@@ -5,9 +5,9 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.1.*",
-                "nategood/httpful": "*",
-                "laravelbook/ardent": "dev-master",
-		"barryvdh/laravel-cors": "dev-master",
+                "nategood/httpful": "0.2.*",
+                "laravelbook/ardent": "2.5.*",
+		"barryvdh/laravel-cors": "1.0.*",
                 "way/generators": "1.1",
                 "fzaninotto/faker": "1.5.*@dev"
 	},
