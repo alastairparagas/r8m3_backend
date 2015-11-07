@@ -7,7 +7,7 @@
 		"laravel/framework": "4.1.*",
                 "nategood/httpful": "0.2.*",
                 "laravelbook/ardent": "2.5.*",
-		"barryvdh/laravel-cors": "1.0.*",
+		"barryvdh/laravel-cors": "0.2.*",
                 "way/generators": "1.1",
                 "fzaninotto/faker": "1.5.*@dev"
 	},
