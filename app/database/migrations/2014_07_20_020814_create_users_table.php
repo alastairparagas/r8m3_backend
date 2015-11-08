@@ -15,11 +15,11 @@ class CreateUsersTable extends Migration {
             Schema::dropIfExists('users');
             Schema::create('users', function(Blueprint $table)
             {
-		$table->increments('id', 10);
+		$table->increments('id');
                 $table->string('username', 16)->unique();
                 $table->string('password', 60);
                 $table->string('email', 30)->unique();
-                $table->integer('uploaded_count', 11);
+                $table->integer('uploaded_count')->default(0);
                 $table->string('remember_token', 50);
 		$table->timestamps();
             });

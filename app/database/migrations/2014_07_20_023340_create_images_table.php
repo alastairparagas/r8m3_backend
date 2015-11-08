@@ -14,12 +14,12 @@ class CreateImagesTable extends Migration {
 	{
             Schema::dropIfExists('images');
             Schema::create('images', function(Blueprint $table){
-		$table->string('id', 10);
+		        $table->string('id', 10);
                 $table->primary('id');
-                $table->integer('user_id', 10)->references('id')->on('users');
+                $table->integer('user_id')->references('id')->on('users');
                 $table->string('file', 200);
                 $table->decimal('rating', 15, 0);
-                $table->integer('raters_count', 11);
+                $table->integer('raters_count')->default(0);
                 $table->timestamps();
             });
 	}
